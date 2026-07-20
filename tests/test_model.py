@@ -20,11 +20,7 @@ class TestModelLoading(unittest.TestCase):
         os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
         dagshub_url = os.getenv("DAGSHUB_URL")
-        repo_owner = os.getenv("REPO_OWNER")
-        repo_name = os.getenv("REPO_NAME")
-
-        # Set up MLflow tracking URI
-        mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
+        mlflow.set_tracking_uri(dagshub_url)
 
         # Load the new model from MLflow model registry
         cls.new_model_name = "my_model"
