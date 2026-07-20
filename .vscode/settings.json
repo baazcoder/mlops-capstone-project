@@ -1,0 +1,14 @@
+{
+  "python-envs.pythonProjects": [
+    {
+        "path": "flask_app",
+        "envManager": "ms-python.python:venv",
+        "packageManager": "ms-python.python:pip"
+    },
+    {
+        "path": "flask_app/templates",
+        "envManager": "ms-python.python:venv",
+        "packageManager": "ms-python.python:pip"
+    }
+]
+}

@@ -29,6 +29,14 @@
     - model_building.py
     - model_evaluation.py
     - register_model.py
+
+python src/data/data_ingestion.py
+python src/data/data_preprocessing.py
+python src/features/feature_engineering.py
+python src/models/model_building.py
+python src/models/model_evaluation.py
+python src/models/register_model.py
+
 18. add file - dvc.yaml (till model evaluation.metrics)
 19. add file - params.yaml
 20. DVC pipeline is ready to run - dvc repro

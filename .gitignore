@@ -8,6 +8,8 @@ __pycache__/
 
 notebooks/
 local_s3/
+models/
+data/
 
 credd.txt
 # Distribution / packaging
