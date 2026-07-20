@@ -29,6 +29,9 @@ jobs:
 
       - name: run pipeline
         env:
+          DAGSHUB_URL: ${{ secrets.DAGSHUB_URL }}
+          REPO_NAME: ${{ secrets.REPO_NAME }}
+          REPO_OWNER: ${{ secrets.REPO_OWNER }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION_NAME }}
@@ -37,4 +40,20 @@ jobs:
         run: |
           dvc repro
 
-     
+      - name: Run model tests
+        env:
+          CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
+        run: |
+          python -m unittest tests/test_model.py
+
+      - name: Promote model to production
+        if: success()
+        env:
+          CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
+        run: python scripts/promote_model.py
+
+      - name: Run Flask app tests
+        if: success()
+        env:
+          CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
+        run: python -m unittest tests/test_flask_app.py
