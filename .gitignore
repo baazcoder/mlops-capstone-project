@@ -9,6 +9,16 @@ __pycache__/
 notebooks/
 local_s3/
 
+# DVC pipeline outputs
+/data/raw/
+/data/interim/
+/data/processed/
+
+/models/model.pkl
+/models/vectorizer.pkl
+
+/reports/experiment_info.json
+
 
 credd.txt
 # Distribution / packaging
