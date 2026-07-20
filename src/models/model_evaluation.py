@@ -16,25 +16,25 @@ load_dotenv()
 # Below code block is for production use
 # -------------------------------------------------------------------------------------
 # Set up DagsHub credentials for MLflow tracking
-# dagshub_token = os.getenv("CAPSTONE_TEST")
-# if not dagshub_token:
-#     raise EnvironmentError("CAPSTONE_TEST environment variable is not set")
+dagshub_token = os.getenv("CAPSTONE_TEST")
+if not dagshub_token:
+    raise EnvironmentError("CAPSTONE_TEST environment variable is not set")
 
-# os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
-# os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
-# dagshub_url = os.getenv("DAGSHUB_URL")
-# repo_owner = os.getenv("REPO_OWNER")
-# repo_name = os.getenv("REPO_NAME")
+dagshub_url = os.getenv("DAGSHUB_URL")
+repo_owner = os.getenv("REPO_OWNER")
+repo_name = os.getenv("REPO_NAME")
 
-# # Set up MLflow tracking URI
-# mlflow.set_tracking_uri(dagshub_url)
+# Set up MLflow tracking URI
+mlflow.set_tracking_uri(dagshub_url)
 # -------------------------------------------------------------------------------------
 
 # Below code block is for local use
 # -------------------------------------------------------------------------------------
-mlflow.set_tracking_uri('https://dagshub.com/baazcoder/mlops-capstone-project.mlflow')
-dagshub.init(repo_owner='baazcoder', repo_name='mlops-capstone-project', mlflow=True)
+# mlflow.set_tracking_uri('https://dagshub.com/baazcoder/mlops-capstone-project.mlflow')
+# dagshub.init(repo_owner='baazcoder', repo_name='mlops-capstone-project', mlflow=True)
 # -------------------------------------------------------------------------------------
 
 
