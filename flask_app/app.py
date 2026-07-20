@@ -114,16 +114,11 @@ PREDICTION_COUNT = Counter(
 # Model and vectorizer setup
 model_name = "my_model"
 def get_latest_model_version(model_name):
-
     client = mlflow.MlflowClient()
-
-    versions = client.search_model_versions(f"name='{model_name}'")
-
-    if not versions:
-        return None
-
-    latest = max(versions, key=lambda v: int(v.version))
-    return latest.version
+    latest_version = client.get_latest_versions(model_name, stages=["Staging"])
+    if not latest_version:
+        latest_version = client.get_latest_versions(model_name, stages=["None"])
+    return latest_version[0].version if latest_version else None
 
 model_version = get_latest_model_version("my_model")
 
