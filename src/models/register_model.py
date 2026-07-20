@@ -73,7 +73,7 @@ def main():
         model_info_path = 'reports/experiment_info.json'
         model_info = load_model_info(model_info_path)
         
-        model_name = "model"
+        model_name = "my_model"
         print(model_info)
         
         register_model(model_name, model_info)

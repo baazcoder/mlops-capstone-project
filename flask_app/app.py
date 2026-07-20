@@ -109,7 +109,7 @@ PREDICTION_COUNT = Counter(
 
 # ------------------------------------------------------------------------------------------
 # Model and vectorizer setup
-model_name = "model"
+model_name = "my_model"
 
 def get_latest_model_version(model_name):
     client = mlflow.MlflowClient()
