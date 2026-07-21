@@ -6,6 +6,8 @@ import os
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 import pickle
+from dotenv import load_dotenv
+load_dotenv()  # Load environment variables from .env file
 
 class TestModelLoading(unittest.TestCase):
 
@@ -20,7 +22,9 @@ class TestModelLoading(unittest.TestCase):
         os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
         dagshub_url = os.getenv("DAGSHUB_URL")
+        print("DAGSHUB_URL =", dagshub_url)
         mlflow.set_tracking_uri(dagshub_url)
+        print("Tracking URI =", mlflow.get_tracking_uri())
 
         # Load the new model from MLflow model registry
         cls.new_model_name = "my_model"

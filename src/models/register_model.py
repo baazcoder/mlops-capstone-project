@@ -6,6 +6,8 @@ import logging
 from src.logger import logging
 import os
 import dagshub
+from dotenv import load_dotenv
+load_dotenv()  # Load environment variables from .env file
 
 import warnings
 warnings.simplefilter("ignore", UserWarning)
