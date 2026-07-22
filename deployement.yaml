@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: flask-app
-        image: 020866158197.dkr.ecr.us-east-1.amazonaws.com/flask-app:latest
+        image: 308281189223.dkr.ecr.ap-south-1.amazonaws.com/churn-repo
         ports:
         - containerPort: 5000
         resources:
