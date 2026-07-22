@@ -74,6 +74,18 @@ def register_model(model_name: str, model_info: dict):
 
     print(f"Version {version} moved to Staging")
 
+    # Verify the transition
+    mv = client.get_model_version(model_name, version)
+    print(f"Current stage after transition: {mv.current_stage}")
+
+    if mv.current_stage != "Staging":
+        raise Exception(
+            f"Failed to move version {version} to Staging. "
+            f"Current stage is '{mv.current_stage}'"
+        )
+
+    print(f"Version {version} successfully moved to Staging")
+
 def main():
     try:
          model_info_path = "reports/experiment_info.json"
