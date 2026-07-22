@@ -23,7 +23,18 @@ def promote_model():
 
     model_name = "my_model"
     # Get the latest version in staging
-    latest_version_staging = client.get_latest_versions(model_name, stages=["Staging"])[0].version
+    staging_versions = client.get_latest_versions(
+    model_name,
+    stages=["Staging"]
+)
+
+    if not staging_versions:
+        raise Exception(
+            f"No model version found in the Staging stage for '{model_name}'. "
+            "Run register_model.py first or verify that the model was transitioned to Staging."
+        )
+
+    latest_version_staging = staging_versions[0].version
 
     # Archive the current production model
     prod_versions = client.get_latest_versions(model_name, stages=["Production"])
