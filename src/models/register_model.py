@@ -51,34 +51,36 @@ def load_model_info(file_path: str) -> dict:
 
 def register_model(model_name: str, model_info: dict):
     """Register the model to the MLflow Model Registry."""
-    try:
-        model_uri = f"runs:/{model_info['run_id']}/{model_info['model_path']}"
-        print(model_uri)
-        # Register the model
-        model_version = mlflow.register_model(model_uri, model_name)
-        
-        # Transition the model to "Staging" stage
-        client = mlflow.tracking.MlflowClient()
-        client.transition_model_version_stage(
-            name=model_name,
-            version=model_version.version,
-            stage="Staging"
-        )
-        
-        logging.debug(f'Model {model_name} version {model_version.version} registered and transitioned to Staging.')
-    except Exception as e:
-        logging.error('Error during model registration: %s', e)
-        raise
+
+    model_uri = f"runs:/{model_info['run_id']}/{model_info['model_path']}"
+    print("Registering:", model_uri)
+
+    # Register model
+    result = mlflow.register_model(model_uri, model_name)
+
+    client = mlflow.tracking.MlflowClient()
+
+    version = result.version
+
+    print(f"Created version: {version}")
+
+    # Move it to Staging
+    client.transition_model_version_stage(
+        name=model_name,
+        version=version,
+        stage="Staging",
+        archive_existing_versions=False
+    )
+
+    print(f"Version {version} moved to Staging")
 
 def main():
     try:
-        model_info_path = 'reports/experiment_info.json'
-        model_info = load_model_info(model_info_path)
-        
-        model_name = "my_model"
-        print(model_info)
-        
-        register_model(model_name, model_info)
+         model_info_path = "reports/experiment_info.json"
+
+         model_info = load_model_info(model_info_path)
+
+         register_model("my_model", model_info)
     except Exception as e:
         logging.error('Failed to complete the model registration process: %s', e)
         print(f"Error: {e}")
