@@ -10,6 +10,8 @@ from nltk.corpus import stopwords
 import string
 import re
 import dagshub
+from dotenv import load_dotenv
+load_dotenv()  # Load environment variables from .env file
 
 import warnings
 warnings.simplefilter("ignore", UserWarning)
@@ -112,6 +114,7 @@ PREDICTION_COUNT = Counter(
 model_name = "my_model"
 
 def get_latest_model_version(model_name):
+    print("Tracking URI:", mlflow.get_tracking_uri())
     client = mlflow.MlflowClient()
 
     # Try Staging first

@@ -11,7 +11,7 @@ prometheus-client
 # Visualization
 # ==========================
 matplotlib>=3.10.6
-
+pipreqs
 # ==========================
 # Web Framework
 # ==========================
