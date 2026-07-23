@@ -1,0 +1,14 @@
+.git
+.github
+.dvc/cache
+mlruns
+logs
+notebooks
+.vscode
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+.env
+.gitignore
