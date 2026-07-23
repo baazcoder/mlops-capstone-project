@@ -93,6 +93,7 @@ def main():
          model_info = load_model_info(model_info_path)
 
          register_model("my_model", model_info)
+         
     except Exception as e:
         logging.error('Failed to complete the model registration process: %s', e)
         print(f"Error: {e}")

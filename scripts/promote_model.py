@@ -2,7 +2,8 @@
 
 import os
 import mlflow
-
+from dotenv import load_dotenv
+load_dotenv()  # Load environment variables from .env file
 def promote_model():
     # Set up DagsHub credentials for MLflow tracking
     dagshub_token = os.getenv("CAPSTONE_TEST")
@@ -22,6 +23,17 @@ def promote_model():
     client = mlflow.MlflowClient()
 
     model_name = "my_model"
+    print("\n===== Registered Models =====")
+    for rm in client.search_registered_models():
+        print(rm.name)
+
+    print("\n===== All Versions =====")
+    for mv in client.search_model_versions(f"name='{model_name}'"):
+        print(
+            f"Version={mv.version}, "
+            f"Stage={mv.current_stage}, "
+            f"Run={mv.run_id}"
+        )
     # Get the latest version in staging
     staging_versions = client.get_latest_versions(
     model_name,

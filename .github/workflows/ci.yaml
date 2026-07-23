@@ -1,6 +1,9 @@
 name: CI Pipeline
 
-on: push
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   project-testing:
@@ -10,84 +13,100 @@ jobs:
       DAGSHUB_URL: ${{ secrets.DAGSHUB_URL }}
       REPO_NAME: ${{ secrets.REPO_NAME }}
       REPO_OWNER: ${{ secrets.REPO_OWNER }}
+      CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
+
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION_NAME }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION_NAME }}
+
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
       S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-      CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11.15"
+          python-version: "3.11"
 
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
+      - name: Cache pip packages
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Run pipeline
+      - name: Verify DVC
+        run: dvc version
+
+      - name: Pull DVC Data
+        run: dvc pull
+
+      - name: Run DVC Pipeline
         run: dvc repro
 
-      - name: Run model tests
+      - name: Debug MLflow Registry
+        run: python scripts/tempCodeRunnerFile.py
+
+      - name: Run Model Tests
         run: python -m unittest tests/test_model.py
 
-      - name: Promote model to production
-        if: success()
+      - name: Promote Model
         run: python scripts/promote_model.py
 
-      - name: Run Flask app tests
-        if: success()
+      - name: Run Flask Tests
         run: python -m unittest tests/test_flask_app.py
-      
-      - name: Login to AWS ECR
-        if: success()
-        run: |
-            aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws configure set region ${{ secrets.AWS_REGION_NAME }}
-            aws ecr get-login-password --region ${{ secrets.AWS_REGION_NAME }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION_NAME }}.amazonaws.com
 
-      - name: Build Docker image
+      - name: Configure AWS Credentials
         run: |
-            docker build -t ${{ secrets.ECR_REPOSITORY }}:latest .
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+          aws configure set default.region $AWS_REGION
 
-      - name: Tag Docker image
+      - name: Login to Amazon ECR
         run: |
-            docker tag ${{ secrets.ECR_REPOSITORY }}:latest \
-            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION_NAME }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
+          aws ecr get-login-password --region $AWS_REGION \
+          | docker login --username AWS --password-stdin \
+          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-    
-      - name: Check Docker Authentication
-        run: docker info
-
-      - name: Push Docker image to ECR
+      - name: Build Docker Image
         run: |
-          docker push ${{ secrets.ECR_REPOSITORY }}:latest
-      
-      - name: Set Up kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'latest'
-      
+          docker build -t $ECR_REPOSITORY:latest .
+
+      - name: Tag Docker Image
+        run: |
+          docker tag $ECR_REPOSITORY:latest \
+          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
+
+      - name: Push Docker Image
+        run: |
+          docker push \
+          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --region ap-south-1 --name flask-app-cluster
+          aws eks update-kubeconfig \
+            --region $AWS_REGION \
+            --name flask-app-cluster
 
       - name: Create Kubernetes Secret
         run: |
           kubectl create secret generic capstone-secret \
-            --from-literal=CAPSTONE_TEST=${{ secrets.CAPSTONE_TEST }} --dry-run=client -o yaml | kubectl apply -f -
+            --from-literal=CAPSTONE_TEST=$CAPSTONE_TEST \
+            --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Deploy to EKS
         run: |
