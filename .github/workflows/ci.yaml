@@ -55,9 +55,6 @@ jobs:
       - name: Run DVC Pipeline
         run: dvc repro
 
-      - name: Debug MLflow Registry
-        run: python scripts/tempCodeRunnerFile.py
-
       - name: Run Model Tests
         run: python -m unittest tests/test_model.py
 
