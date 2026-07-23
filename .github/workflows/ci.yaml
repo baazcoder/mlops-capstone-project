@@ -39,7 +39,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run DVC pipeline
+      - name: Run pipeline
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+          CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
         run: dvc repro
 
       - name: Run model tests
