@@ -4,6 +4,10 @@ WORKDIR /app
 
 COPY . .
 
+RUN pwd
+RUN ls -la
+RUN find . -maxdepth 2
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN python -m nltk.downloader stopwords wordnet
