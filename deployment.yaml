@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: flask-app
-        image: 308281189223.dkr.ecr.ap-south-1.amazonaws.com/churn-repo
+        image: 308281189223.dkr.ecr.ap-south-1.amazonaws.com/churn-repo:${GITHUB_SHA}
         ports:
         - containerPort: 5000
         resources:
