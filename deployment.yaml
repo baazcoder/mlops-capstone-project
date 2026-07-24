@@ -32,7 +32,11 @@ spec:
             secretKeyRef:
               name: capstone-secret
               key: CAPSTONE_TEST
-
+        - name: DAGSHUB_URL
+          valueFrom:
+            configMapKeyRef:
+              name: dagshub-config
+              key: DAGSHUB_URL
 ---
 apiVersion: v1
 kind: Service
